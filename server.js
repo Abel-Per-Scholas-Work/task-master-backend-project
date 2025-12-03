@@ -22,6 +22,7 @@ require("./config/passport");
 
 // ========= Routes ======================
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/projects", require("./routes/projectRoutes"));
 
 // Use this route to setup the API documentation
 app.get("/", (req, res) => {
