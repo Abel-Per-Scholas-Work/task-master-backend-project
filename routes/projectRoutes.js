@@ -5,20 +5,45 @@ const { authMiddleware } = require("../middleware/auth");
 // Apply authMiddleware to all routes in this file
 router.use(authMiddleware);
 
-// GET /api/notes - Get all notes for the logged-in user
+// GET /api/projects - Get all projects for the logged-in user
 // THIS IS THE ROUTE THAT CURRENTLY HAS THE FLAW
 router.get("/", async (req, res) => {
-	// This currently finds all notes in the database.
-	// It should only find notes owned by the logged in user.
+	// This currently finds all projects in the database.
+	// It should only find projects owned by the logged in user.
 	try {
-		const notes = await Project.find({ user: req.user._id });
-		res.json(notes);
+		const projects = await Project.find({ user: req.user._id });
+		res.json(projects);
 	} catch (err) {
 		res.status(500).json(err);
 	}
 });
 
-// POST /api/notes - Create a new note
+// GET /api/projects/:id - Get a projects
+// THIS IS THE ROUTE THAT CURRENTLY HAS THE FLAW
+router.get("/:id", async (req, res) => {
+	// This currently finds a projects in the database with an ID.
+	// the owner is only one with permission to view it.
+	try {
+		// This needs an authorization check
+		//get to be update note
+		const project = await Project.findById(req.params.id);
+		if (!project) {
+			return res.status(400).json({ message: "Invalid ID" });
+		}
+		// check if the user field on that note matches the authenticated user’s _id.
+		if (project.user.toString() !== req.user._id) {
+			return res
+				.status(403)
+				.json({ message: "Not Authorize to view this project" });
+		}
+
+		res.json(project);
+	} catch (err) {
+		res.status(500).json(err);
+	}
+});
+
+// POST /api/projects - Create a new note
 router.post("/", async (req, res) => {
 	try {
 		const note = await Project.create({
@@ -32,17 +57,17 @@ router.post("/", async (req, res) => {
 	}
 });
 
-// PUT /api/notes/:id - Update a note
+// PUT /api/projects/:id - Update a note
 router.put("/:id", async (req, res) => {
 	try {
 		// This needs an authorization check
 		//get to be update note
-		const getNote = await Project.findById(req.params.id);
-		if (!getNote) {
+		const getUpdateProject = await Project.findById(req.params.id);
+		if (!getUpdateProject) {
 			return res.status(400).json({ message: "Invalid ID" });
 		}
 		// check if the user field on that note matches the authenticated user’s _id.
-		if (getNote.user.toString() !== req.user._id) {
+		if (getDeleteProject.user.toString() !== req.user._id) {
 			return res
 				.status(403)
 				.json({ message: "Not Authorize to update this note" });
@@ -60,17 +85,17 @@ router.put("/:id", async (req, res) => {
 	}
 });
 
-// DELETE /api/notes/:id - Delete a note
+// DELETE /api/projects/:id - Delete a note
 router.delete("/:id", async (req, res) => {
 	try {
 		// This needs an authorization check
 		//get to be update note
-		const getNote = await Project.findById(req.params.id);
-		if (!getNote) {
+		const getDeleteProject = await Project.findById(req.params.id);
+		if (!getDeleteProject) {
 			return res.status(400).json({ message: "Invalid ID" });
 		}
 		// check if the user field on that note matches the authenticated user’s _id.
-		if (getNote.user.toString() !== req.user._id) {
+		if (getDeleteProject.user.toString() !== req.user._id) {
 			return res
 				.status(403)
 				.json({ message: "Not Authorize to delete this note" });
