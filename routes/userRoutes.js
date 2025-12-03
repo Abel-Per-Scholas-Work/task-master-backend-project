@@ -17,12 +17,12 @@ const userRouter = express.Router();
 /**
  * GET /api/user/
  */
-userRouter.get("/", authMiddleware, adminOnly, getAllUsers);
+userRouter.get("/", authMiddleware, getAllUsers);
 
 /**
  * GET /api/user/:id
  */
-userRouter.get("/:id", getUserById);
+userRouter.get("/:id", authMiddleware, adminOnly, getUserById);
 
 /**
  * POST /api/user/register
