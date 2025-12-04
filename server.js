@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 // Set up all variables in the .env file
 require("dotenv").config();
@@ -19,6 +20,7 @@ const app = express();
 app.use(morgan("dev")); // logger
 app.use(express.json()); // body parser
 require("./config/passport");
+app.use(cors({ origin: "http://localhost:5173" }));
 
 // ========= Routes ======================
 app.use("/api/users", require("./routes/userRoutes"));
